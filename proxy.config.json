@@ -1,0 +1,9 @@
+{
+
+    "/api/*": {
+        "target": "https://api.tracker.gg",
+        "secure": false,
+        "logLevel": "debug",
+        "changeOrigin": true
+    }
+}

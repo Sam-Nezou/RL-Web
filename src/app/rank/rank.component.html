@@ -1,0 +1,30 @@
+<div class="pt-12">
+
+    <div class="my-1 px-1 w-full shadow-xl  bg-gray-300 ">
+
+        <div class="grid grid-cols-2 space-y-4   ">
+            <div class="col-span-2 grid grid-cols-2 ">
+                <div class="block">
+                    <mat-form-field appearance="fill">
+                        <mat-label>Rank</mat-label>
+                        <select matNativeControl [(ngModel)]="selectedRank" (change)="setGraph(this.result[selectedRank])" name="rank">
+                          <option value="" selected></option>
+                          <option *ngFor="let rank of selectRank" [value]="rank.value">
+                            {{rank.name}}
+                          </option>
+                        </select>
+                    </mat-form-field>
+                </div>
+                <div class="block">
+                    <app-rank-resume></app-rank-resume>
+                </div>
+            </div>
+            <div class="col-span-2 block">
+                <div fxFlex>
+                    <plotly-plot fxFlex [style]="{width: '100%', height: '100%'}" [useResizeHandler]="true" [data]="allData" [config]="config" [layout]="layout">
+                    </plotly-plot>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
