@@ -1,9 +1,10 @@
-import { Component, OnInit, Input, NgModule} from '@angular/core';
+import { Component, OnInit, Input, NgModule, EventEmitter, Output } from '@angular/core';
 import { Rank, selectRank } from '../class/Rank';
 import { RankService } from './rank.service';
 import * as Constante from '../class/Constante'
-import { Observable,interval,Subscription, timer } from 'rxjs';
+import { Observable, interval, Subscription, timer } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { RankResumeComponent } from './rank-resume/rank-resume.component';
 
 
 @Component({
@@ -13,93 +14,105 @@ import { switchMap } from 'rxjs/operators';
 })
 export class RankComponent implements OnInit {
 
-  error ='';
-  data: Rank[];
+  error = '';
+  data: Rank;
   result: Rank[][];
-  selectedRank : number;
+  selectedRank: number;
+  @Output()
+  itemAdded = new EventEmitter<Rank>();
 
+  @Input() userId: number;
+  /**
+   * Graphique
+   */
+  public configGraph: any[];
 
- @Input() userId: number;
-/**
- * Graphique
- */
-  public allData: any[];
+  /**
+   * Contient les données a afficher dans le graph
+   */
   public layout: object;
   public config: object;
 
-  subscription : Subscription;
+  subscription: Subscription;
 
   selectRank: selectRank[] = [
-    { name : "UNRANKED" , value : Constante.UN_RANKED },
-    { name : "1V1", value : Constante.RANKED_1V1 },
-    { name : "2V2", value : Constante.RANKED_2V2 },
-    { name : "3V3", value : Constante.RANKED_3V3 },
-    { name : "TOURNOIS", value : Constante.TOURNAMENT },
-    { name : "SNOWDAY", value : Constante.SNOWDAY },
-    { name : "RUMBLE", value : Constante.RUMBLE },
-    { name : "HOOPS", value : Constante.HOOPS },
+    { name: "UNRANKED", value: Constante.UN_RANKED },
+    { name: "1V1", value: Constante.RANKED_1V1 },
+    { name: "2V2", value: Constante.RANKED_2V2 },
+    { name: "3V3", value: Constante.RANKED_3V3 },
+    { name: "TOURNOIS", value: Constante.TOURNAMENT },
+    { name: "SNOWDAY", value: Constante.SNOWDAY },
+    { name: "RUMBLE", value: Constante.RUMBLE },
+    { name: "HOOPS", value: Constante.HOOPS },
   ];
 
-  tableColumn: string[] = ['tier','division','rating']
+  tableColumn: string[] = ['tier', 'division', 'rating']
 
-  
-  constructor(private RankService : RankService) { 
-    this.data = [];
+
+  constructor(private RankService: RankService) {
     this.selectedRank = 0;
   }
 
 
-  
-  ngOnInit(): void 
-  {
+
+  ngOnInit(): void {
+
     this.initGraph();
-    this.subscription = timer(0,25000).pipe(
+    this.subscription = timer(0, 25000).pipe(
       switchMap(() => this.RankService.getRank(this.userId))).subscribe(
-      (res ) => {
-        this.result = res;
-
-      },
-      (err) => {
-        this.error = err;
-      }
-    )
-
+        (res) => {
+          this.result = res;
+        },
+        (err) => {
+          this.error = err;
+        }
+      )
     this.setGraph(this.result[0]);
-      
   }
 
-
-  initGraph(){
-    this.allData = [];
-    this.allData.push({
-        type: 'scatter',
-        mode: 'lines+points',
-        x: [],
-        y: []
-    });        
+  /**
+   * 
+   */
+  initGraph(): void {
+    this.configGraph = [];
+    this.configGraph.push({
+      type: 'scatter',
+      mode: 'lines+points',
+      // fill: 'tozero',
+      x: ['Date'],
+      y: ['rating']
+    });
     this.layout = {
-        title: 'Stat',
-        autosize: true
+      title: 'Stat',
+      autosize: true
     };
     this.config = {
-        responsive: false
-    }; 
+      responsive: false
+    };
   }
 
+  /**
+   * Set le graph
+   * 
+   * @param ranks 
+   */
+  setGraph(ranks: Rank[]): void {
 
-  setGraph(ranks: Rank[]) : void{
-
+    console.log(ranks);
+    // Order rating by date
+    ranks.sort((a, b) => a.collectDate < b.collectDate ? -1 : 1);
     let xTemp: object[] = [];
     let yTemp: number[] = [];
     ranks.forEach(element => {
-      this.layout ={
-        title: element.tier + ' ' + element.division ,
+      this.layout = {
+        title: element.tier + ' ' + element.division,
       };
+      this.data = element;
       xTemp.push(new Date(element.collectDate));
       yTemp.push(element.rating);
     });
-    this.allData[0].x =xTemp;
-    this.allData[0].y =yTemp;
+    this.configGraph[0].x = xTemp;
+    this.configGraph[0].y = yTemp;
   }
 
 
