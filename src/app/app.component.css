@@ -1,0 +1,5 @@
+body {
+    background-image: url("src/assets/image/wallpaper/wallpaper.jpg");
+    background-color: #cccccc;
+    /* background-repeat: no-repeat, repeat; */
+}

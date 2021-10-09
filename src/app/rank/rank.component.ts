@@ -56,22 +56,22 @@ export class RankComponent implements OnInit {
 
 
   ngOnInit(): void {
-
+    this.result = [];
     this.initGraph();
     this.subscription = timer(0, 25000).pipe(
       switchMap(() => this.RankService.getRank(this.userId))).subscribe(
         (res) => {
           this.result = res;
+          this.setGraph(this.result[0]);
         },
         (err) => {
           this.error = err;
         }
       )
-    this.setGraph(this.result[0]);
   }
 
   /**
-   * 
+   * Initialisation du tableau
    */
   initGraph(): void {
     this.configGraph = [];
@@ -92,13 +92,16 @@ export class RankComponent implements OnInit {
   }
 
   /**
-   * Set le graph
+   * Set les données du graph
    * 
    * @param ranks 
    */
   setGraph(ranks: Rank[]): void {
 
-    console.log(ranks);
+    if (undefined === ranks) {
+      ranks = [];
+    }
+
     // Order rating by date
     ranks.sort((a, b) => a.collectDate < b.collectDate ? -1 : 1);
     let xTemp: object[] = [];

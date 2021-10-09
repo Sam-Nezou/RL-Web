@@ -1,4 +1,4 @@
-import { Component, OnInit , Input, OnChanges, SimpleChanges} from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Rank } from 'src/app/class/Rank';
 
@@ -11,30 +11,32 @@ export class RankResumeComponent implements OnChanges {
 
 
 
-  @Input() 
-  rank : Rank[];
+  @Input()
+  rank: Rank[];
 
 
-  public lastRank : Rank;
-  subscription : Subscription;
+  public lastRank: Rank;
+  subscription: Subscription;
 
   constructor() { }
   ngOnChanges(changes: SimpleChanges): void {
-    this.lastRank = this.rank[this.rank.length-1];
-    console.log(this.lastRank.rating)
-    }
+    this.ngOnInit();
+  }
 
   ngOnInit(): void {
-    this.lastRank = this.rank[this.rank.length-1];
-    console.log(this.lastRank.rating)
+    this.lastRank = null;
+
+    if (this.rank !== undefined) {
+      this.lastRank = this.rank[this.rank.length - 1];
+    }
   }
 
 
-/**
- * Set le last rank
- * @param rank 
- */
-  public setLastRank(rank: Rank) : void{
+  /**
+   * Set le last rank
+   * @param rank 
+   */
+  public setLastRank(rank: Rank): void {
     this.lastRank = rank
   }
 }
